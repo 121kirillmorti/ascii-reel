@@ -1,11 +1,11 @@
 :root {
   --bg: #000000;
   --bg-soft: #0a0a0a;
-  --line: rgba(255, 255, 255, 0.16);
-  --dim: rgba(255, 255, 255, 0.45);
+  --line: rgba(99, 255, 159, 0.22);
+  --dim: rgba(255, 255, 255, 0.5);
   --bright: #ffffff;
-  --accent: #ffffff;
-  --accent-rgb: 255, 255, 255;
+  --accent: #63ff9f;
+  --accent-rgb: 99, 255, 159;
   --font: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, "Courier New", monospace;
 }
 
@@ -14,10 +14,7 @@
 html, body { height: 100%; }
 
 body {
-  background:
-    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(255, 255, 255, 0.045), transparent 70%),
-    radial-gradient(ellipse 40% 40% at 85% 10%, rgba(255, 255, 255, 0.025), transparent 70%),
-    var(--bg);
+  background: #000;
   color: var(--bright);
   font-family: var(--font);
   overflow: hidden;
@@ -232,8 +229,9 @@ body {
   transition: color 500ms ease;
 }
 
-.layer-dim { color: rgba(255, 255, 255, 0.26); text-shadow: 0 0 3px rgba(255, 255, 255, 0.12); }
-.layer-bright { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.45), 0 0 20px rgba(255, 255, 255, 0.16); }
+.layer-dim { color: rgba(99, 255, 159, 0.2); text-shadow: 0 0 3px rgba(99, 255, 159, 0.1); }
+.layer-green { color: var(--accent); text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.55), 0 0 20px rgba(var(--accent-rgb), 0.2); }
+.layer-white { color: #ffffff; text-shadow: 0 0 9px rgba(255, 255, 255, 0.7), 0 0 22px rgba(255, 255, 255, 0.25); }
 
 .corner {
   position: absolute;
