@@ -1,6 +1,5 @@
 /* ============================================================
-   ASCII CUBE — бело-зелёный 3D-куб с настоящими логотипами на гранях.
-   Вращение куба само показывает следующую грань с логотипом.
+   ASCII CUBE — бело-зелёный куб, который крутится вместе с тобой.
    ============================================================ */
 
 (() => {
@@ -8,10 +7,8 @@
 
   const D = window.PORTFOLIO;
   const LOGO_ART = window.LOGO_ART || {};
-
   const TAU = Math.PI * 2;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const IDLE_SPIN = reduced ? 0 : 0.0032;
 
   const el = {
     viewport: document.getElementById('viewport'),
@@ -29,7 +26,6 @@
     dots: document.getElementById('dots'),
     count: document.getElementById('count'),
     progress: document.getElementById('progress'),
-    hint: document.getElementById('hint'),
     mode: document.getElementById('mode'),
     rain: document.getElementById('rain'),
     clock: document.getElementById('clock'),
@@ -37,19 +33,18 @@
     next: document.getElementById('next')
   };
 
-  // Six faces of the cube = six frames of the reel.
   const faces = [
-    { key: 'intro', target: [0, 0], slide: D.intro },
-    { key: 'stickcommander', target: [-Math.PI / 2, 0], slide: D.projects[0] },
-    { key: 'm5wheel', target: [Math.PI, 0], slide: D.projects[1] },
-    { key: 'justvibrait', target: [Math.PI / 2, 0], slide: D.projects[2] },
-    { key: 'tetris', target: [0, Math.PI / 2], slide: D.projects[3] },
-    { key: 'github', target: [0, -Math.PI / 2], slide: D.outro }
+    { key: 'intro', slide: D.intro, target: [0, 0] },
+    { key: 'stickcommander', slide: D.projects[0], target: [-Math.PI / 2, 0] },
+    { key: 'm5wheel', slide: D.projects[1], target: [Math.PI, 0] },
+    { key: 'justvibrait', slide: D.projects[2], target: [Math.PI / 2, 0] },
+    { key: 'tetris', slide: D.projects[3], target: [0, Math.PI / 2] },
+    { key: 'github', slide: D.outro, target: [0, -Math.PI / 2] }
   ];
 
   let cols = 96, rows = 42, fontSize = 10;
   let points = [];
-  let angle = 0, manualTilt = 0, spin = IDLE_SPIN;
+  let rotY = 0.35, rotX = -0.22, velY = 0, velX = 0;
   let dragging = false, lastX = 0, lastY = 0;
   let visibleIndex = -1, lastFrame = performance.now();
 
@@ -57,112 +52,103 @@
   const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
   const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  /* ---------- layout ---------- */
+  /* ---------- размеры ---------- */
 
   function resize() {
     cols = window.innerWidth < 720 ? 64 : 96;
     rows = window.innerWidth < 720 ? 30 : 42;
     const box = el.stageWrap.getBoundingClientRect();
-    fontSize = Math.max(2.4, Math.min(box.width / (cols * 0.625), box.height / (rows * 1.04)));
+    fontSize = Math.max(2.2, Math.min(box.width / (cols * 0.625), box.height / (rows * 1.04)));
     for (const layer of [el.layerDim, el.layerGreen, el.layerWhite]) layer.style.fontSize = fontSize.toFixed(2) + 'px';
     points = makeCube();
     visibleIndex = -1;
   }
 
-  /* ---------- cube point cloud ---------- */
+  /* ---------- куб из точек ---------- */
 
-  const FACE_BASIS = [
-    { n: [0, 0, 1], u: [1, 0, 0], v: [0, 1, 0] },   // +Z front
-    { n: [1, 0, 0], u: [0, 0, -1], v: [0, 1, 0] },  // +X right
-    { n: [0, 0, -1], u: [-1, 0, 0], v: [0, 1, 0] }, // -Z back
-    { n: [-1, 0, 0], u: [0, 0, 1], v: [0, 1, 0] },  // -X left
-    { n: [0, 1, 0], u: [1, 0, 0], v: [0, 0, -1] },  // +Y top
-    { n: [0, -1, 0], u: [1, 0, 0], v: [0, 0, 1] }   // -Y bottom
+  const BASIS = [
+    { n: [0, 0, 1], u: [1, 0, 0], v: [0, 1, 0] },
+    { n: [1, 0, 0], u: [0, 0, -1], v: [0, 1, 0] },
+    { n: [0, 0, -1], u: [-1, 0, 0], v: [0, 1, 0] },
+    { n: [-1, 0, 0], u: [0, 0, 1], v: [0, 1, 0] },
+    { n: [0, 1, 0], u: [1, 0, 0], v: [0, 0, -1] },
+    { n: [0, -1, 0], u: [1, 0, 0], v: [0, 0, 1] }
   ];
 
   function logoRows(key) {
-    const raw = LOGO_ART[key] || '';
-    const lines = raw.split('\n');
-    return lines.length ? lines : Array(18).fill(' '.repeat(30));
+    const lines = (LOGO_ART[key] || '').split('\n');
+    return lines.length > 1 ? lines : Array(28).fill(' '.repeat(48));
   }
 
   function makeCube() {
     const out = [];
     faces.forEach((face, fi) => {
-      const basis = FACE_BASIS[fi];
+      const b = BASIS[fi];
       const lines = logoRows(face.key);
       const h = lines.length, w = Math.max(...lines.map(l => l.length));
       for (let v = 0; v < h; v++) {
         for (let u = 0; u < w; u++) {
           const ch = lines[v][u] || ' ';
           const a = (u / (w - 1)) * 2 - 1;
-          const b = (v / (h - 1)) * 2 - 1;
+          const bb = (v / (h - 1)) * 2 - 1;
           const pos = [0, 0, 0];
-          for (let k = 0; k < 3; k++) {
-            pos[k] = basis.n[k] * 1.002 + basis.u[k] * a * 0.94 + basis.v[k] * b * 0.94;
-          }
-          out.push({ pos, normal: basis.n, ch: ch === ' ' ? '.' : ch, layer: ch === ' ' ? 0 : 1, seed: Math.random() });
+          for (let k = 0; k < 3; k++) pos[k] = b.n[k] * 1.003 + b.u[k] * a * 0.97 + b.v[k] * bb * 0.97;
+          out.push({ pos, normal: b.n, ch: ch === ' ' ? ':' : ch, layer: ch === ' ' ? 0 : 1 });
         }
       }
     });
 
-    // White wireframe edges make the cube unmistakably 3D.
+    // белые рёбра, чтобы куб читался как куб
     const corners = [];
     for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) corners.push([x, y, z]);
-    const edgePairs = [];
     for (let i = 0; i < 8; i++) {
       for (let j = i + 1; j < 8; j++) {
-        const diff = corners[i].filter((val, k) => val !== corners[j][k]).length;
-        if (diff === 1) edgePairs.push([corners[i], corners[j]]);
+        if (corners[i].filter((val, k) => val !== corners[j][k]).length !== 1) continue;
+        const a = corners[i], b = corners[j];
+        for (let t = 0; t <= 38; t++) {
+          const k = t / 38;
+          out.push({
+            pos: a.map((val, idx) => val + (b[idx] - val) * k),
+            normal: null,
+            ch: k === 0 || k === 1 ? '+' : '#',
+            layer: 2
+          });
+        }
       }
     }
-    edgePairs.forEach(([a, b]) => {
-      for (let t = 0; t <= 30; t++) {
-        const k = t / 30;
-        out.push({
-          pos: a.map((val, i) => val + (b[i] - val) * k),
-          normal: null,
-          ch: k === 0 || k === 1 ? '+' : '#',
-          layer: 2,
-          seed: Math.random()
-        });
-      }
-    });
     return out;
   }
 
-  /* ---------- orientation from rotation ---------- */
-
-  function orientation() {
-    const turn = angle / TAU;
-    const seg = Math.floor(turn);
-    const f = turn - seg;
-    const i = ((seg % faces.length) + faces.length) % faces.length;
-    const e = smooth(0.12, 0.88, f);
-    const from = faces[i].target, to = faces[(i + 1) % faces.length].target;
-    const ry = from[0] + (to[0] - from[0]) * e;
-    const rx = from[1] + (to[1] - from[1]) * e + manualTilt;
-    const active = f < 0.5 ? i : (i + 1) % faces.length;
-    const focus = 1 - smooth(0.06, 0.34, Math.min(f, 1 - f));
-    return { i, f, ry, rx, active, focus };
+  function rotate(v, ry, rx) {
+    const cy = Math.cos(ry), sy = Math.sin(ry);
+    const cx = Math.cos(rx), sx = Math.sin(rx);
+    const x = v[0] * cy + v[2] * sy;
+    let z = -v[0] * sy + v[2] * cy;
+    const y = v[1] * cx - z * sx;
+    z = v[1] * sx + z * cx;
+    return [x, y, z];
   }
 
   function project(pos, ry, rx) {
-    const cy = Math.cos(ry), sy = Math.sin(ry);
-    const cx = Math.cos(rx), sx = Math.sin(rx);
-    const x = pos[0] * cy + pos[2] * sy;
-    let z = -pos[0] * sy + pos[2] * cy;
-    const y = pos[1] * cx - z * sx;
-    z = pos[1] * sx + z * cx;
+    const [x, y, z] = rotate(pos, ry, rx);
     const p = 3.9 / (3.9 - z);
     return {
-      x: cols / 2 + x * p * cols * 0.185,
-      y: rows / 2 - y * p * rows * 0.255,
+      x: cols / 2 + x * p * cols * 0.21,
+      y: rows / 2 - y * p * rows * 0.30,
       z
     };
   }
 
-  /* ---------- panel ---------- */
+  function activeFace(ry, rx) {
+    let best = 0, bestZ = -Infinity;
+    BASIS.forEach((b, i) => {
+      const z = rotate(b.n, ry, rx)[2];
+      if (z > bestZ) { bestZ = z; best = i; }
+    });
+    return { index: best, focus: smooth(0.3, 0.82, bestZ) };
+  }
+
+  /* ---------- текст под кубом ---------- */
 
   function renderPanel(slide, index) {
     el.eyebrow.textContent = slide.eyebrow || '';
@@ -171,19 +157,19 @@
     el.tags.innerHTML = (slide.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
 
     if (index > 0 && index < 5) {
-      el.extra.innerHTML = `<span>★ ${slide.stars || 0}</span><span>OPEN SOURCE</span>`;
+      el.extra.innerHTML = `<span>★ ${slide.stars || 0}</span><span>исходники на GitHub</span>`;
       el.link.hidden = false;
       el.link.href = slide.url;
-      el.link.textContent = 'OPEN REPOSITORY ↗';
+      el.link.textContent = 'посмотреть репозиторий ↗';
     } else if (index === 5) {
       el.extra.innerHTML = (slide.personal || []).map(x => `<span>${escapeHtml(x)}</span>`).join('') +
-        (slide.socials || []).map(s => `<a href="${escapeHtml(s.url)}" target="_blank" rel="noopener">[ ${escapeHtml(s.label)} ↗ ]</a>`).join('');
+        (slide.socials || []).map(s => `<a href="${escapeHtml(s.url)}" target="_blank" rel="noopener">↗ ${escapeHtml(s.label)}</a>`).join('');
       el.link.hidden = true;
     } else {
       el.extra.innerHTML = `<span>${escapeHtml(D.profile.role)}</span><span>${escapeHtml(D.profile.location)}</span>`;
       el.link.hidden = false;
       el.link.href = 'https://github.com/121kirillmorti?tab=repositories';
-      el.link.textContent = 'ALL REPOSITORIES ↗';
+      el.link.textContent = 'все репозитории ↗';
     }
 
     el.count.textContent = String(index + 1).padStart(2, '0');
@@ -196,28 +182,33 @@
     el.progress.innerHTML = faces.map(() => '<span></span>').join('');
     el.dots.addEventListener('click', e => {
       const b = e.target.closest('.dot');
-      if (b) { angle = Number(b.dataset.i) * TAU; spin = IDLE_SPIN; manualTilt = 0; }
+      if (!b) return;
+      [rotY, rotX] = faces[Number(b.dataset.i)].target;
+      velY = 0; velX = 0;
     });
   }
 
-  /* ---------- frame ---------- */
+  /* ---------- кадр ---------- */
 
   function render(now) {
     const dt = Math.min(50, now - lastFrame);
     lastFrame = now;
+
     if (!dragging) {
-      angle += spin * dt / 16.7;
-      spin += (IDLE_SPIN - spin) * 0.025;
-      manualTilt *= 0.98;
+      const idleX = reduced ? 0 : 0.00055 * Math.sin(now * 0.00028);
+      const idleY = reduced ? 0 : 0.0022;
+      velY += (idleY - velY) * 0.028;
+      velX += (idleX - velX) * 0.028;
+      rotY += velY * dt / 16.7;
+      rotX += velX * dt / 16.7;
     }
 
-    const o = orientation();
-    if (o.active !== visibleIndex) { renderPanel(faces[o.active].slide, o.active); visibleIndex = o.active; }
-    el.info.classList.toggle('show', o.focus > 0.35);
-    el.info.style.opacity = (0.4 + 0.6 * o.focus).toFixed(2);
-    el.hint.classList.toggle('faded', o.focus > 0.5);
-    el.mode.textContent = o.focus > 0.7 ? 'FACE: LOGO LOCKED' : 'CUBE: ROTATING';
-    el.mode.classList.toggle('active', o.focus > 0.7);
+    const active = activeFace(rotY, rotX);
+    if (active.index !== visibleIndex) { renderPanel(faces[active.index].slide, active.index); visibleIndex = active.index; }
+    el.info.classList.toggle('show', active.focus > 0.28);
+    el.info.style.opacity = (0.45 + 0.55 * active.focus).toFixed(2);
+    el.mode.textContent = active.focus > 0.72 ? 'вот оно' : 'вертится...';
+    el.mode.classList.toggle('active', active.focus > 0.72);
 
     const dim = Array(cols * rows).fill(' ');
     const green = Array(cols * rows).fill(' ');
@@ -225,8 +216,8 @@
     const zbuf = new Float32Array(cols * rows).fill(-Infinity);
 
     for (const p of points) {
-      const rp = project(p.pos, o.ry, o.rx);
-      if (rp.z <= -0.02) continue; // rear half of the cube is hidden
+      const rp = project(p.pos, rotY, rotX);
+      if (rp.z <= -0.02) continue;
       const c = Math.round(rp.x), r = Math.round(rp.y);
       if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
       const idx = r * cols + c;
@@ -249,7 +240,7 @@
     return out.join('\n');
   }
 
-  /* ---------- input ---------- */
+  /* ---------- управление ---------- */
 
   function bindInput() {
     el.viewport.addEventListener('pointerdown', e => {
@@ -265,15 +256,17 @@
       if (!dragging) return;
       const dx = e.clientX - lastX, dy = e.clientY - lastY;
       lastX = e.clientX; lastY = e.clientY;
-      angle += dx * 0.008;
-      manualTilt = clamp(manualTilt + dy * 0.003, -1.0, 1.0);
-      spin = clamp(dx * 0.008, -0.1, 0.1);
+      rotY += dx * 0.009;
+      rotX += dy * 0.009;   // крутим и вверх, и вниз без ограничений
+      velY = dx * 0.009;
+      velX = dy * 0.009;
     });
 
     const end = e => {
       if (!dragging) return;
       dragging = false;
-      spin = clamp(spin, -0.08, 0.08);
+      velY = clamp(velY, -0.12, 0.12);
+      velX = clamp(velX, -0.12, 0.12);
       el.viewport.classList.remove('grabbing');
       if (e.pointerId !== undefined && el.viewport.hasPointerCapture(e.pointerId)) el.viewport.releasePointerCapture(e.pointerId);
     };
@@ -282,13 +275,13 @@
 
     el.viewport.addEventListener('wheel', e => {
       e.preventDefault();
-      angle += e.deltaY * 0.0019;
-      spin = clamp(e.deltaY * 0.0019, -0.09, 0.09);
+      rotY += e.deltaY * 0.0022;
+      velY = clamp(e.deltaY * 0.0022, -0.1, 0.1);
     }, { passive: false });
 
     const step = dir => {
-      angle = (Math.floor(angle / TAU) + dir) * TAU;
-      spin = IDLE_SPIN; manualTilt = 0;
+      rotY = Math.round((rotY + dir * Math.PI / 2) / (Math.PI / 2)) * (Math.PI / 2);
+      velY = 0; velX = 0;
     };
     document.addEventListener('keydown', e => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); step(1); }
@@ -301,8 +294,6 @@
     window.addEventListener('resize', () => { clearTimeout(timer); timer = setTimeout(resize, 180); });
   }
 
-  /* ---------- ambient ---------- */
-
   function startRain() {
     const chars = '01<>/\\|+=*#';
     let grid = [];
@@ -313,7 +304,7 @@
     setInterval(() => {
       const rr = Math.ceil(innerHeight / 19), cc = Math.ceil(innerWidth / 9);
       if (grid.length !== rr || grid[0].length !== cc) reset();
-      for (let k = 0; k < 18; k++) grid[Math.floor(Math.random() * rr)][Math.floor(Math.random() * cc)] = chars[Math.floor(Math.random() * chars.length)];
+      for (let k = 0; k < 16; k++) grid[Math.floor(Math.random() * rr)][Math.floor(Math.random() * cc)] = chars[Math.floor(Math.random() * chars.length)];
       el.rain.textContent = grid.map(row => row.join('')).join('\n');
     }, 170);
   }

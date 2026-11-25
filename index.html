@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#000000">
-  <meta name="description" content="Интерактивное ч/б-портфолио: 3D-куб с логотипами проектов на гранях.">
-  <title>KOTIKTORTIKTECH // ASCII_PORTFOLIO</title>
+  <meta name="description" content="Небольшой сайт Кирилла: куб, который можно крутить, а на гранях — логотипы его проектов.">
+  <title>кирилл // куб</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -19,8 +19,7 @@
     <header class="topbar">
       <div class="brand">
         <span class="brand-mark">[=]</span>
-        <span class="brand-name" data-i18n="brand">KOTIKTORTIKTECH</span>
-        <span class="brand-suffix">.EXE</span>
+        <span class="brand-name">кирилл.куб</span>
       </div>
       <div class="topbar-meta">
         <span id="clock">00:00:00</span>
@@ -28,27 +27,22 @@
     </header>
 
     <main class="main">
-      <aside class="rail rail-left" aria-label="Навигация по слайдам">
-        <div class="rail-label">REEL</div>
-        <div id="dots" class="dots" role="tablist" aria-label="Слайды"></div>
+      <aside class="rail rail-left" aria-label="Грани куба">
+        <div class="rail-label">грани</div>
+        <div id="dots" class="dots" role="tablist" aria-label="Грани"></div>
         <div class="rail-count"><span id="count">00</span><span class="dim">/06</span></div>
       </aside>
 
-      <section class="viewport" id="viewport" tabindex="0" aria-label="3D ASCII куб. Перетаскивайте или используйте колесо мыши">
+      <section class="viewport" id="viewport" tabindex="0" aria-label="Куб, который можно вращать мышью или клавиатурой">
         <div class="stage-wrap">
           <div class="stage-glow" aria-hidden="true"></div>
           <pre class="layer layer-dim" id="layer-dim" aria-hidden="true"></pre>
           <pre class="layer layer-green" id="layer-green" aria-hidden="true"></pre>
           <pre class="layer layer-white" id="layer-white" aria-hidden="true"></pre>
-          <div class="corner tl" aria-hidden="true">+--[ 3D CUBE / 6 FACES ]--+</div>
-          <div class="corner tr" aria-hidden="true">v2.0</div>
-          <div class="corner bl" aria-hidden="true">DRAG TO ROTATE</div>
-          <div class="corner br" aria-hidden="true" id="mode">CUBE: ROTATING</div>
-        </div>
-
-        <div class="hint" id="hint">
-          <span class="hint-key">DRAG</span> / <span class="hint-key">WHEEL</span> / <span class="hint-key">← →</span>
-          <span class="hint-text">вращай куб — логотипы на гранях сменяются сами</span>
+          <div class="corner tl" aria-hidden="true">+-- логотипы на гранях --+</div>
+          <div class="corner tr" aria-hidden="true">покрути</div>
+          <div class="corner bl" aria-hidden="true">тяни мышкой</div>
+          <div class="corner br" aria-hidden="true" id="mode">вертится...</div>
         </div>
 
         <div class="info" id="info" aria-live="polite">
@@ -62,18 +56,18 @@
       </section>
 
       <aside class="rail rail-right" aria-label="Управление">
-        <div class="rail-label">INPUT</div>
-        <button class="step-btn" id="prev" type="button" aria-label="Предыдущий слайд">[ &uarr; ]</button>
-        <button class="step-btn" id="next" type="button" aria-label="Следующий слайд">[ &darr; ]</button>
-        <div class="rail-label small">MOTION<br>ENABLED</div>
+        <div class="rail-label">управление</div>
+        <button class="step-btn" id="prev" type="button" aria-label="Предыдущая грань">[ &uarr; ]</button>
+        <button class="step-btn" id="next" type="button" aria-label="Следующая грань">[ &darr; ]</button>
+        <div class="rail-label small">мышь<br>клавиши</div>
       </aside>
     </main>
 
     <footer class="footer">
       <div class="progress" id="progress" aria-hidden="true"></div>
       <div class="footer-row">
-        <span>ASCII / MOTION / NO FRAMEWORKS</span>
-        <span>BUILT WITH <span class="heart">&lt;3</span> AND A LOT OF <span class="dim">CHAR(32)</span></span>
+        <span>сделал Кирилл, покрутил — спасибо</span>
+        <span>Актобе · Kotlin · ESP32 · кофе</span>
       </div>
     </footer>
   </div>

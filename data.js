@@ -1,29 +1,26 @@
-/* EDIT ME — все тексты и ссылки сайта лежат здесь. */
+/* Всё, что тут написано, можно спокойно менять на своё. */
 window.PORTFOLIO = {
   profile: {
-    name: 'KOTIKTORTIKTECH',
+    name: 'Кирилл',
     handle: '@121kirillmorti',
-    role: 'ANDROID // EMBEDDED // CREATIVE CODING',
-    location: 'AKTOBE, KZ',
-    tagline: 'Делаю железо, которое слушается телефона.'
+    role: 'ANDROID · ESP32 · МАЛЕНЬКИЕ ШТУКИ',
+    location: 'Актобе, Казахстан'
   },
 
-  // Слайд 01 — автарка
   intro: {
-    eyebrow: '// IDENTITY',
-    title: 'KOTIKTORTIKTECH',
-    text: 'Привет. Я Кирилл — собираю Android-приложения, возюсь с ESP32 и M5Stick и превращаю железяки в толковые Tools. Покрути куб: на его гранях — логотипы моих проектов.',
-    tags: ['KOTLIN', 'C++', 'ESP32', 'JETPACK COMPOSE']
+    eyebrow: '// ну привет',
+    title: 'Кирилл',
+    text: 'Я Кирилл. Живу в Актобе, пишу приложения под Android, время от времени ковыряю ESP32 и M5Stick. Получается по-разному, но почти всегда интересно. Крути куб — на гранях логотипы того, что у меня вышло.',
+    tags: ['ANDROID', 'KOTLIN', 'ESP32', 'M5STICK']
   },
 
   projects: [
     {
       slug: 'stickcommander',
       art: 'stickcommander',
-      logo: ['STICK', 'COMMANDER'],
-      eyebrow: '// PROJECT 01 · 2025',
+      eyebrow: '// проект первый, 2025',
       title: 'StickCommander',
-      text: 'Android-приложение + прошивка Bruce 1.16.1 для M5StickC Plus 2: живое меню, зеркало экрана, IR-пульт, менеджер LittleFS и терминал.',
+      text: 'Приложение для Android и прошивка Bruce на M5StickC Plus 2. Живое меню, зеркало экрана, ИК-пульт, менеджер файлов и терминал. Вышел маленький пульт, который всегда под рукой.',
       tags: ['KOTLIN', 'BRUCE', 'BLE', 'ESP32'],
       stars: 3,
       url: 'https://github.com/121kirillmorti/stickcommander'
@@ -31,10 +28,9 @@ window.PORTFOLIO = {
     {
       slug: 'm5wheel-ets2',
       art: 'm5wheel',
-      logo: ['M5', 'WHEEL'],
-      eyebrow: '// PROJECT 02 · 2025',
+      eyebrow: '// проект второй, 2025',
       title: 'm5wheel-ets2',
-      text: 'Гироскопический руль на M5StickC Plus 2: BLE HID (Logitech G29), 1080°, десктопное C++ приложение с зеркалом экрана и установщиком для Windows.',
+      text: 'Руль на гироскопе из M5StickC Plus 2. Определяется как Logitech G29, крутится на 1080°, плюс небольшая программа на C++ с зеркалом экрана и установщиком для Windows. Для ETS2 — то что надо.',
       tags: ['C++', 'BLE HID', 'GYRO', 'WINDOWS'],
       stars: 0,
       url: 'https://github.com/121kirillmorti/m5wheel-ets2'
@@ -42,10 +38,9 @@ window.PORTFOLIO = {
     {
       slug: 'justvibrait',
       art: 'justvibrait',
-      logo: ['JUST', 'VIBRAIT'],
-      eyebrow: '// PROJECT 03 · 2025',
+      eyebrow: '// проект третий, 2025',
       title: 'justvibrait',
-      text: 'Вибрация в такт музыке: Android-приложение на Kotlin/Compose с FFT-анализом баса, AudioPlaybackCapture и микрофоном, плюс Windows-монитор по UDP.',
+      text: 'Приложение, которое вибрирует в такт музыке. Слушает бас через FFT, умеет подхватывать звук с микрофона или из Android, а рядом на Windows висит маленький монитор вибрации.',
       tags: ['KOTLIN', 'FFT', 'UDP', 'MATERIAL YOU'],
       stars: 1,
       url: 'https://github.com/121kirillmorti/justvibrait'
@@ -53,31 +48,28 @@ window.PORTFOLIO = {
     {
       slug: 'tetris-you',
       art: 'tetris',
-      logo: ['TETRIS', 'YOU'],
-      eyebrow: '// PROJECT 04 · 2024',
+      eyebrow: '// проект четвёртый, 2024',
       title: 'Tetris You',
-      text: 'Material You тетрис для Android: офлайн, двуязычный (RU/EN), без рекламы. Привычная классика с аккуратным интерфейсом.',
+      text: 'Тетрис в стиле Material You. Работает офлайн, говорит по-русски и по-английски, без рекламы и лишних разрешений. Просто тетрис, который приятно открывать.',
       tags: ['KOTLIN', 'COMPOSE', 'RU/EN', 'OFFLINE'],
       stars: 1,
       url: 'https://github.com/121kirillmorti/tetris-you'
     }
   ],
 
-  // Финальный слайд
   outro: {
-    eyebrow: '// END OF REEL · ELSE / ABOUT ME',
-    title: 'THANKS FOR WATCHING',
-    text: 'Живу в Актобе. Чем занимаюсь: пишу Android-приложения, прошиваю ESP32/M5Stick, делаю интерфейсы в Material You и иногда — странные штуки ради интереса. Люблю терминалы, ретро-эстетику и когда код наконец работает с первого раза.',
+    eyebrow: '// на этом всё',
+    title: 'Спасибо, что крутил',
+    text: 'Если докрутил сюда — спасибо. Я всё ещё учусь и делаю всякое: приложения, железяки, странные штуки просто для себя. Если что-то зацепило — пиши, всегда рад поговорить.',
     personal: [
-      '📍 Актобе, Казахстан',
-      '⚡ Железо + Kotlin + любопытство',
-      '☕ Кофе и долгие вечера за компиляцией'
+      'Актобе, Казахстан',
+      'Кофе, ESP32 и долгие вечера',
+      'Люблю, когда завелось с первого раза'
     ],
     socials: [
-      { label: 'GITHUB', url: 'https://github.com/121kirillmorti' },
-      { label: 'BLOG', url: 'https://github.com/121kirillmorti/121kirillmorti' },
-      { label: 'REPOS', url: 'https://github.com/121kirillmorti?tab=repositories' }
-      // Добавь сюда Telegram / почту / другие соцсети, когда захочешь.
+      { label: 'GitHub', url: 'https://github.com/121kirillmorti' },
+      { label: 'профиль', url: 'https://github.com/121kirillmorti/121kirillmorti' },
+      { label: 'репозитории', url: 'https://github.com/121kirillmorti?tab=repositories' }
     ]
   }
 };

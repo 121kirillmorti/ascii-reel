@@ -110,15 +110,6 @@ body {
 .brand-name { font-weight: 700; letter-spacing: 0.18em; }
 .brand-suffix, .dim { color: var(--dim); }
 .topbar-meta { display: flex; gap: 24px; align-items: center; }
-.status { display: flex; align-items: center; gap: 8px; }
-.status i {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 10px var(--accent);
-  animation: pulse 2.2s ease-in-out infinite;
-}
-
-@keyframes pulse { 50% { opacity: 0.25; } }
 @keyframes blink { 50% { opacity: 0.25; } }
 
 .main {
@@ -246,22 +237,6 @@ body {
 .corner.br { bottom: 4px; right: 4px; }
 .corner.br.active::before { content: "● "; color: var(--accent); }
 
-.hint {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  color: var(--dim);
-  margin-top: 6px;
-  transition: opacity 400ms ease;
-}
-.hint-key { color: var(--bright); border: 1px solid var(--line); padding: 3px 6px; }
-.hint-text { opacity: 0.7; }
-.hint.faded { opacity: 0.3; }
-
 /* ---------- info panel ---------- */
 
 .info {
@@ -350,7 +325,6 @@ body {
 
 @media (max-width: 520px) {
   .rail-label.small { display: none; }
-  .hint-text { display: none; }
   .info-text { font-size: 11px; }
   .footer-row span:last-child { display: none; }
 }

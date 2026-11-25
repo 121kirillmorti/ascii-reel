@@ -12,7 +12,7 @@ from PIL import Image, ImageOps
 import resvg_py
 
 ROOT = Path(__file__).resolve().parents[1]
-SIZE = (30, 18)
+SIZE = (48, 28)
 RAMP = " .:-=+*#%@"
 
 SOURCES = {
