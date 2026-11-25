@@ -33,21 +33,12 @@ body {
 .noise {
   opacity: 0.05;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.8'/%3E%3C/svg%3E");
-  animation: noise-shift 0.6s steps(3) infinite;
-}
-
-@keyframes noise-shift {
-  0% { transform: translate(0, 0); }
-  33% { transform: translate(-2%, 1%); }
-  66% { transform: translate(1%, -2%); }
-  100% { transform: translate(0, 0); }
 }
 
 .scanlines {
   background: repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0, 0, 0, 0.28) 3px 4px);
-  opacity: 0.5;
+  opacity: 0.24;
   z-index: 30;
-  mix-blend-mode: multiply;
 }
 
 .grid-floor {
@@ -61,12 +52,7 @@ body {
   transform: perspective(340px) rotateX(66deg) scale(1.8);
   transform-origin: bottom center;
   mask-image: linear-gradient(to bottom, transparent, #000 55%);
-  animation: floor-scroll 7s linear infinite;
-  opacity: 0.45;
-}
-
-@keyframes floor-scroll {
-  to { background-position: 0 40px, 0 0; }
+  opacity: 0.35;
 }
 
 #rain {
@@ -107,8 +93,8 @@ body {
 
 .brand { display: flex; align-items: baseline; gap: 8px; color: var(--bright); }
 .brand-mark { color: var(--accent); animation: blink 1.4s steps(1) infinite; }
-.brand-name { font-weight: 700; letter-spacing: 0.18em; }
-.brand-suffix, .dim { color: var(--dim); }
+.brand-face { color: var(--accent); margin-left: 6px; }
+.dim { color: var(--dim); }
 .topbar-meta { display: flex; gap: 24px; align-items: center; }
 @keyframes blink { 50% { opacity: 0.25; } }
 
@@ -198,10 +184,7 @@ body {
   border-radius: 50%;
   background: radial-gradient(ellipse, rgba(var(--accent-rgb), 0.11), transparent 70%);
   filter: blur(24px);
-  animation: breathe 5s ease-in-out infinite;
 }
-
-@keyframes breathe { 50% { opacity: 0.45; transform: scale(1.08); } }
 
 .layer {
   position: absolute;
@@ -235,7 +218,6 @@ body {
 .corner.tr { top: 4px; right: 4px; }
 .corner.bl { bottom: 4px; left: 4px; }
 .corner.br { bottom: 4px; right: 4px; }
-.corner.br.active::before { content: "● "; color: var(--accent); }
 
 /* ---------- info panel ---------- */
 
@@ -330,5 +312,5 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .noise, .grid-floor, .stage-glow, .status i, .brand-mark { animation: none !important; }
+  .brand-mark { animation: none !important; }
 }

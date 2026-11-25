@@ -26,7 +26,6 @@
     dots: document.getElementById('dots'),
     count: document.getElementById('count'),
     progress: document.getElementById('progress'),
-    mode: document.getElementById('mode'),
     rain: document.getElementById('rain'),
     clock: document.getElementById('clock'),
     prev: document.getElementById('prev'),
@@ -119,32 +118,14 @@
     return out;
   }
 
-  function rotate(v, ry, rx) {
-    const cy = Math.cos(ry), sy = Math.sin(ry);
-    const cx = Math.cos(rx), sx = Math.sin(rx);
-    const x = v[0] * cy + v[2] * sy;
-    let z = -v[0] * sy + v[2] * cy;
-    const y = v[1] * cx - z * sx;
-    z = v[1] * sx + z * cx;
-    return [x, y, z];
-  }
-
-  function project(pos, ry, rx) {
-    const [x, y, z] = rotate(pos, ry, rx);
-    const p = 3.9 / (3.9 - z);
-    return {
-      x: cols / 2 + x * p * cols * 0.21,
-      y: rows / 2 - y * p * rows * 0.30,
-      z
-    };
-  }
-
-  function activeFace(ry, rx) {
+  function activeFace(cy, sy, cx, sx) {
     let best = 0, bestZ = -Infinity;
-    BASIS.forEach((b, i) => {
-      const z = rotate(b.n, ry, rx)[2];
+    for (let i = 0; i < BASIS.length; i++) {
+      const n = BASIS[i].n;
+      const z0 = -n[0] * sy + n[2] * cy;
+      const z = n[1] * sx + z0 * cx;
       if (z > bestZ) { bestZ = z; best = i; }
-    });
+    }
     return { index: best, focus: smooth(0.3, 0.82, bestZ) };
   }
 
@@ -191,6 +172,7 @@
   /* ---------- кадр ---------- */
 
   function render(now) {
+    if (now - lastFrame < 12) { requestAnimationFrame(render); return; }
     const dt = Math.min(50, now - lastFrame);
     lastFrame = now;
 
@@ -203,26 +185,33 @@
       rotX += velX * dt / 16.7;
     }
 
-    const active = activeFace(rotY, rotX);
+    const cy = Math.cos(rotY), sy = Math.sin(rotY);
+    const cx = Math.cos(rotX), sx = Math.sin(rotX);
+    const active = activeFace(cy, sy, cx, sx);
     if (active.index !== visibleIndex) { renderPanel(faces[active.index].slide, active.index); visibleIndex = active.index; }
     el.info.classList.toggle('show', active.focus > 0.28);
     el.info.style.opacity = (0.45 + 0.55 * active.focus).toFixed(2);
-    el.mode.textContent = active.focus > 0.72 ? 'вот оно' : 'вертится...';
-    el.mode.classList.toggle('active', active.focus > 0.72);
 
     const dim = Array(cols * rows).fill(' ');
     const green = Array(cols * rows).fill(' ');
     const white = Array(cols * rows).fill(' ');
     const zbuf = new Float32Array(cols * rows).fill(-Infinity);
+    const halfW = cols / 2, halfH = rows / 2, kx = cols * 0.21, ky = rows * 0.30;
 
-    for (const p of points) {
-      const rp = project(p.pos, rotY, rotX);
-      if (rp.z <= -0.02) continue;
-      const c = Math.round(rp.x), r = Math.round(rp.y);
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i], pos = p.pos;
+      const x = pos[0] * cy + pos[2] * sy;
+      const z0 = -pos[0] * sy + pos[2] * cy;
+      const y = pos[1] * cx - z0 * sx;
+      const z = pos[1] * sx + z0 * cx;
+      if (z <= -0.02) continue;
+      const persp = 3.9 / (3.9 - z);
+      const c = (halfW + x * persp * kx) | 0;
+      const r = (halfH - y * persp * ky) | 0;
       if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
       const idx = r * cols + c;
-      if (rp.z <= zbuf[idx]) continue;
-      zbuf[idx] = rp.z;
+      if (z <= zbuf[idx]) continue;
+      zbuf[idx] = z;
       if (p.layer === 0) dim[idx] = p.ch;
       else if (p.layer === 1) green[idx] = p.ch;
       else white[idx] = p.ch;
@@ -304,9 +293,9 @@
     setInterval(() => {
       const rr = Math.ceil(innerHeight / 19), cc = Math.ceil(innerWidth / 9);
       if (grid.length !== rr || grid[0].length !== cc) reset();
-      for (let k = 0; k < 16; k++) grid[Math.floor(Math.random() * rr)][Math.floor(Math.random() * cc)] = chars[Math.floor(Math.random() * chars.length)];
+      for (let k = 0; k < 12; k++) grid[Math.floor(Math.random() * rr)][Math.floor(Math.random() * cc)] = chars[Math.floor(Math.random() * chars.length)];
       el.rain.textContent = grid.map(row => row.join('')).join('\n');
-    }, 170);
+    }, 280);
   }
 
   function startClock() {
