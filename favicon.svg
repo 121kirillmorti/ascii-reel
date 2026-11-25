@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#000"/>
+  <g fill="none" stroke="#fff" stroke-width="2">
+    <path d="M10 12h44v40H10z"/>
+    <path d="M18 20h28M18 28h14M18 36h22M18 44h10"/>
+  </g>
+  <text x="32" y="52" fill="#fff" font-family="monospace" font-size="10" text-anchor="middle">[=]</text>
+</svg>
